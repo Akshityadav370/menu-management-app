@@ -172,7 +172,7 @@ const snacks = [
 ];
 export default function HomeScreen(props: any) {
   // Items List/Array
-  const [menuList, setMenuList] = useState([]);
+  const [menuList, setMenuList] = useState<any>([]);
   const [activeDishes, setActiveDishes] = useState([]);
   const [inactiveDishes, setInactiveDishes] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -202,12 +202,26 @@ export default function HomeScreen(props: any) {
       // });
       // return;
       // }
-      const docRef = await addDoc(collection(db, "menu"), {
-        title: newTitle,
-        description: description,
-        status: status,
-      });
-      console.log("Document written with ID: ", docRef.id);
+      if (Math.random() > 0.5) {
+        const docRef = await addDoc(collection(db, "wines"), {
+          title: newTitle,
+          description: description,
+          tags: description,
+          price: "$30",
+          status: status,
+          type: "wines",
+        });
+      } else {
+        const docRef = await addDoc(collection(db, "cocktails"), {
+          title: newTitle,
+          description: description,
+          tags: description,
+          price: "$30",
+          status: status,
+          type: "cocktails",
+        });
+      }
+      // console.log("Document written with ID: ", docRef.id);
       // After creation, setting the state variables back to null
       setNewTitle("");
       setDescription("");
@@ -224,26 +238,36 @@ export default function HomeScreen(props: any) {
   // Fetching/Reading the menu items from the firestore
   const getMenuList = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "menu"));
-      const items: any = [];
-      querySnapshot.forEach((doc) => {
-        items.push({
+      const querySnapshot1 = await getDocs(collection(db, "wines"));
+      const items1: any = [];
+      querySnapshot1.forEach((doc) => {
+        items1.push({
+          ...doc.data(),
+          id: doc.id,
+        });
+      });
+
+      const querySnapshot2 = await getDocs(collection(db, "cocktails"));
+      const items2: any = [];
+      querySnapshot2.forEach((doc) => {
+        items2.push({
           ...doc.data(),
           id: doc.id,
         });
       });
       // Storing the fetched items in our state variable
-      setMenuList(items);
+      const combinedItems = [...items1, ...items2];
+      setMenuList(combinedItems);
 
       // if (menuList.length === 0) addMenuItem();
 
       // Separating active and inactive dishes from the fetched menu items
-      const active = items.filter((item: any) => item.status);
-      const inactive = items.filter((item: any) => !item.status);
+      const active = menuList.filter((item: any) => item.status);
+      const inactive = menuList.filter((item: any) => !item.status);
       setActiveDishes(active);
       setInactiveDishes(inactive);
 
-      console.log("***Menu List", items);
+      // console.log("***Menu List", menuList);
     } catch (e) {
       console.error("Error getting documents: ", e);
     }
@@ -252,9 +276,9 @@ export default function HomeScreen(props: any) {
   // Deleting all the menu items in the cloud firestore but not the collection
   const deleteAllItems = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "menu"));
+      const querySnapshot = await getDocs(collection(db, "wines"));
       querySnapshot.forEach((item) => {
-        deleteDoc(doc(db, "menu", item.id));
+        deleteDoc(doc(db, "wines", item.id));
       });
       // Setting our local state variable data to null
       setMenuList([]);
@@ -366,6 +390,7 @@ export default function HomeScreen(props: any) {
               desc={item.description}
               status={item.status}
               id={item.id}
+              type={item.type}
               getMenuList={getMenuList}
             />
           )}

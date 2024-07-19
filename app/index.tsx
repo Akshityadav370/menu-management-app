@@ -99,18 +99,18 @@ export default function App() {
     try {
       if (user) {
         // If user is already authenticated, log out
-        console.log("User logged out successfully!");
+        // console.log("User logged out successfully!");
         await signOut(auth);
       } else {
         // Sign in or sign up
         if (isLogin) {
           // Sign in
           await signInWithEmailAndPassword(auth, email, password);
-          console.log("User signed in successfully!");
+          // console.log("User signed in successfully!");
         } else {
           // Sign up
           await createUserWithEmailAndPassword(auth, email, password);
-          console.log("User created successfully!");
+          // console.log("User created successfully!");
         }
       }
     } catch (error: any) {

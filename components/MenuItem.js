@@ -33,10 +33,20 @@ const MenuItem = (props) => {
 
   // To update the status of the menu card
   const updateIsActive = async () => {
-    const menuRef = doc(db, "menu", props.id);
-    await updateDoc(menuRef, {
-      status: isActive
-    });
+    switch (props.type) {
+      case "wines":
+        const menuRef1 = doc(db, "wines", props.id);
+        await updateDoc(menuRef1, {
+          status: isActive,
+        });
+        break;
+      case "cocktails":
+        const menuRef2 = doc(db, "cocktails", props.id);
+        await updateDoc(menuRef2, {
+          status: isActive,
+        });
+        break;
+    }
     // Given this to re-render active/inactive items on dashboard
     props.getMenuList();
   };
@@ -44,8 +54,16 @@ const MenuItem = (props) => {
   // To delete the menu item
   const deleteMenuItem = async () => {
     try {
-      const menuRef = doc(db, "menu", props.id);
-      await deleteDoc(menuRef);
+      switch (props.type) {
+        case "wines":
+          const menuRef1 = doc(db, "wines", props.id);
+          await deleteDoc(menuRef1);
+          break;
+        case "cocktails":
+          const menuRef2 = doc(db, "cocktails", props.id);
+          await deleteDoc(menuRef2);
+          break;
+      }
       props.getMenuList(); // Refresh menu list after deletion
     } catch (error) {
       console.error("Error deleting menu item: ", error);
@@ -74,13 +92,26 @@ const MenuItem = (props) => {
 
   // To update the menu item i.e. title, desc, status
   const updateMenuItem = async () => {
-    const menuRef = doc(db, "menu", props.id);
-
-    await updateDoc(menuRef, {
-      title: title,
-      description: description,
-      status: true
-    });
+    switch (props.type) {
+      case "wines":
+        const menuRef1 = doc(db, "wines", props.id);
+        await updateDoc(menuRef1, {
+          title: title,
+          description: description,
+          tags: description,
+          status: isActive,
+        });
+        break;
+      case "cocktails":
+        const menuRef2 = doc(db, "cocktails", props.id);
+        await updateDoc(menuRef2, {
+          title: title,
+          description: description,
+          tags: description,
+          status: isActive,
+        });
+        break;
+    }
     setModalVisible(false);
     props.getMenuList();
   };
@@ -286,4 +317,3 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
-
