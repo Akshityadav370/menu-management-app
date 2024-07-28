@@ -13,7 +13,7 @@ import {
   Modal,
   Switch,
 } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import {
   app,
@@ -26,6 +26,7 @@ import {
   doc,
 } from "@/firebase/index";
 import MenuItem from "@/components/MenuItem";
+import { useRouter } from "expo-router";
 const wines = [
   {
     title: "Tea",
@@ -171,6 +172,7 @@ const snacks = [
   },
 ];
 export default function HomeScreen(props: any) {
+  const router = useRouter();
   // Items List/Array
   const [menuList, setMenuList] = useState<any>([]);
   const [activeDishes, setActiveDishes] = useState([]);
@@ -340,6 +342,14 @@ export default function HomeScreen(props: any) {
         </Pressable>
         <Pressable onPress={confirmDeleteAllItems}>
           <Text style={styles.clearMenuText}>Clear All</Text>
+        </Pressable>
+        <Pressable onPress={() => router.push("/OrdersScreen")}>
+          <MaterialCommunityIcons
+            name="cookie"
+            size={35}
+            style={{ marginLeft: 20 }}
+            color="skyblue"
+          />
         </Pressable>
       </View>
       {/* User Info */}

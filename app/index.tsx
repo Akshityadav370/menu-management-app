@@ -25,7 +25,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import HomeScreen from "./(tabs)/HomeScreen";
+import HomeScreen from "./HomeScreen";
 
 const AuthScreen = ({
   email,
