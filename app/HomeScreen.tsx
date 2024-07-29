@@ -27,6 +27,9 @@ import {
 } from "@/firebase/index";
 import MenuItem from "@/components/MenuItem";
 import { useRouter } from "expo-router";
+import { FontAwesome6 } from "@expo/vector-icons";
+import logo from "@/assets/images/Viraaj Ventures Logo.png";
+import listLogo from "@/assets/images/list_logo.jpg";
 const wines = [
   {
     title: "Tea",
@@ -321,36 +324,40 @@ export default function HomeScreen(props: any) {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <AntDesign
+        {/* <AntDesign
           name="weibo-circle"
           size={35}
           style={{ marginRight: 7 }}
           color="goldenrod"
-        />
-        <Text style={styles.heading}>Viraaj Ventures</Text>
+        /> */}
+        {/* <Text style={styles.heading}>Viraaj Ventures</Text> */}
+        <Image source={logo} style={styles.logo} />
         {/* Options (Add, Delete All) */}
-        <Pressable
-          onPress={() => setModalVisible(true)}
-          style={styles.headRight}
-        >
-          <AntDesign
-            name="pluscircle"
-            size={30}
-            style={{ marginRight: 20 }}
-            color="olivedrab"
-          />
-        </Pressable>
-        <Pressable onPress={confirmDeleteAllItems}>
-          <Text style={styles.clearMenuText}>Clear All</Text>
-        </Pressable>
-        <Pressable onPress={() => router.push("/OrdersScreen")}>
-          <MaterialCommunityIcons
-            name="cookie"
-            size={35}
-            style={{ marginLeft: 20 }}
-            color="skyblue"
-          />
-        </Pressable>
+        <View style={styles.headerOptions}>
+          <Pressable
+            onPress={() => setModalVisible(true)}
+            style={styles.headRight}
+          >
+            <AntDesign
+              name="pluscircle"
+              size={30}
+              style={{ marginRight: 20 }}
+              color="olivedrab"
+            />
+          </Pressable>
+          <Pressable onPress={confirmDeleteAllItems}>
+            <Text style={styles.clearMenuText}>Clear All</Text>
+          </Pressable>
+          <Pressable onPress={() => router.push("/OrdersScreen")}>
+            <FontAwesome6
+              name="clipboard-list"
+              size={35}
+              style={{ marginLeft: 20 }}
+              color="skyblue"
+            />
+            {/* <Image source={listLogo}></Image> */}
+          </Pressable>
+        </View>
       </View>
       {/* User Info */}
       <View style={styles.userHeader}>
@@ -477,6 +484,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginVertical: 10,
   },
+  logo: {
+    height: 100,
+    width: "20%",
+    resizeMode: "contain",
+  },
+  headerOptions: { flexDirection: "row" },
   heading: {
     fontSize: 28,
     fontWeight: "600",
