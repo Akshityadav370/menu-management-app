@@ -164,6 +164,7 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
+    fontSize: 20,
     borderColor: "white",
     color: "white",
     borderWidth: 1,

@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
 export default function OrdersScreen() {
@@ -18,8 +18,8 @@ export default function OrdersScreen() {
     {
       id: 1,
       tableNo: 2,
-      total: "21",
       status: 2,
+      specialInstructions: "No onions in any dish",
       items: [
         { name: "Item 1", qty: 2, price: "10" },
         { name: "Item 2", qty: 1, price: "2" },
@@ -29,8 +29,8 @@ export default function OrdersScreen() {
     {
       id: 2,
       tableNo: 3,
-      total: "25",
       status: 3,
+      specialInstructions: "Extra spicy for all items",
       items: [
         { name: "Item 3", qty: 2, price: "10" },
         { name: "Item 1", qty: 1, price: "2" },
@@ -40,8 +40,8 @@ export default function OrdersScreen() {
     {
       id: 3,
       tableNo: 4,
-      total: "30",
       status: 1,
+      specialInstructions: "Gluten-free options only",
       items: [
         { name: "Item 5", qty: 1, price: "10" },
         { name: "Item 2", qty: 2, price: "5" },
@@ -51,8 +51,8 @@ export default function OrdersScreen() {
     {
       id: 4,
       tableNo: 1,
-      total: "18",
       status: 2,
+      specialInstructions: "No added sugar",
       items: [
         { name: "Item 2", qty: 2, price: "4" },
         { name: "Item 3", qty: 1, price: "6" },
@@ -62,8 +62,8 @@ export default function OrdersScreen() {
     {
       id: 5,
       tableNo: 5,
-      total: "40",
       status: 1,
+      specialInstructions: "Vegetarian options only",
       items: [
         { name: "Item 6", qty: 4, price: "10" },
         { name: "Item 1", qty: 2, price: "5" },
@@ -73,8 +73,8 @@ export default function OrdersScreen() {
     {
       id: 6,
       tableNo: 6,
-      total: "35",
       status: 3,
+      specialInstructions: "No cilantro",
       items: [
         { name: "Item 3", qty: 3, price: "10" },
         { name: "Item 2", qty: 2, price: "10" },
@@ -84,8 +84,8 @@ export default function OrdersScreen() {
     {
       id: 7,
       tableNo: 7,
-      total: "22",
       status: 2,
+      specialInstructions: "No nuts",
       items: [
         { name: "Item 7", qty: 1, price: "12" },
         { name: "Item 2", qty: 2, price: "4" },
@@ -95,8 +95,8 @@ export default function OrdersScreen() {
     {
       id: 8,
       tableNo: 8,
-      total: "27",
       status: 1,
+      specialInstructions: "Extra crispy for all fried items",
       items: [
         { name: "Item 4", qty: 3, price: "18" },
         { name: "Item 5", qty: 1, price: "5" },
@@ -106,8 +106,8 @@ export default function OrdersScreen() {
     {
       id: 9,
       tableNo: 9,
-      total: "16",
       status: 2,
+      specialInstructions: "Add lemon slices",
       items: [
         { name: "Item 2", qty: 2, price: "4" },
         { name: "Item 6", qty: 1, price: "10" },
@@ -117,8 +117,8 @@ export default function OrdersScreen() {
     {
       id: 10,
       tableNo: 10,
-      total: "50",
       status: 3,
+      specialInstructions: "No dairy products",
       items: [
         { name: "Item 8", qty: 5, price: "20" },
         { name: "Item 3", qty: 2, price: "10" },
@@ -158,37 +158,9 @@ export default function OrdersScreen() {
         <Text style={styles.customerName}>
           Table <Text style={styles.tableNo}>{item.tableNo}</Text>
         </Text>
-        <View style={styles.orderStatus}>
-          {[1, 2, 3, 4].map((status) => (
-            <TouchableOpacity
-              key={status}
-              onPress={() => updateOrderStatus(item.id, status)}
-              style={[
-                styles.status,
-                item.status === status && {
-                  backgroundColor: getStatusColor(status),
-                },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.statusText,
-                  item.status === status && {
-                    color: "whitesmoke",
-                    fontSize: 15,
-                  },
-                ]}
-              >
-                {status === 1
-                  ? "Placed"
-                  : status === 2
-                  ? "Accepted"
-                  : status === 3
-                  ? "Preparing"
-                  : "Delivered"}
-              </Text>
-            </TouchableOpacity>
-          ))}
+        <View style={styles.orderPrice}>
+          <AntDesign name="delete" size={24} color={"tomato"} />
+          <FontAwesome name="edit" size={24} color={"goldenrod"} />
         </View>
       </View>
       <View style={styles.orderItemBody}>
@@ -199,10 +171,39 @@ export default function OrdersScreen() {
             </Text>
           ))}
         </View>
-        <View style={styles.orderPrice}>
-          <Text style={styles.totalText}>₹{item.total}</Text>
-          <AntDesign name="delete" size={24} color={"goldenrod"} />
-        </View>
+        <Text style={styles.instructions}>{item.specialInstructions}</Text>
+      </View>
+      <View style={styles.orderStatus}>
+        {[1, 2, 3, 4].map((status) => (
+          <TouchableOpacity
+            key={status}
+            onPress={() => updateOrderStatus(item.id, status)}
+            style={[
+              styles.status,
+              item.status === status && {
+                backgroundColor: getStatusColor(status),
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.statusText,
+                item.status === status && {
+                  color: "whitesmoke",
+                  fontSize: 15,
+                },
+              ]}
+            >
+              {status === 1
+                ? "Placed"
+                : status === 2
+                ? "Accepted"
+                : status === 3
+                ? "Preparing"
+                : "Delivered"}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
     </View>
   );
@@ -254,6 +255,7 @@ const styles = StyleSheet.create({
   orderItemHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
   },
   orderItemsList: {
     gap: 5,
@@ -269,19 +271,26 @@ const styles = StyleSheet.create({
   tableNo: { color: "white" },
   orderItemBody: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
     marginTop: "3%",
+  },
+  instructions: {
+    margin: "auto",
+    color: "peachpuff",
+    fontSize: 15,
+    fontStyle: "italic",
+    fontWeight: "400",
+    flexWrap: "wrap",
   },
   orderStatus: {
     flexDirection: "row",
-    // marginTop: "auto",
-    marginVertical: "auto",
-    gap: 7,
+    marginTop: "5%",
+    justifyContent: "space-between",
   },
   orderPrice: {
     marginTop: "auto",
     flexDirection: "row",
-    gap: 10,
+    gap: 20,
     alignItems: "center",
   },
   status: {
