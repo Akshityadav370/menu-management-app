@@ -185,6 +185,8 @@ export default function HomeScreen(props: any) {
   const [newTitle, setNewTitle] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState(false);
+  const [showActive, setShowActive] = useState(false);
+  const [showInactive, setShowInactive] = useState(false);
 
   // Creating the menu item in cloud firestore
   const addMenuItem = async () => {
@@ -380,20 +382,58 @@ export default function HomeScreen(props: any) {
         {/* Active & Inactive Items rendering */}
         <View>
           <View style={styles.dishesContainer}>
-            <Text style={styles.dishes}>
-              Active Dishes ({activeDishes.length}):{" "}
-            </Text>
-            <Text style={styles.dishName}>
-              {activeDishes.map((dish: any) => dish.title).join(", ")}
-            </Text>
+            <Pressable onPress={() => setShowActive(!showActive)}>
+              <Text style={styles.dishes}>
+                Active Dishes ({activeDishes.length}){" "}
+                {showActive ? (
+                  <FontAwesome6
+                    name="sort-up"
+                    size={24}
+                    color="white"
+                    style={{ alignSelf: "baseline" }}
+                  />
+                ) : (
+                  <FontAwesome6
+                    style={{ alignSelf: "baseline" }}
+                    name="sort-down"
+                    size={24}
+                    color="white"
+                  />
+                )}
+              </Text>
+            </Pressable>
+            {showActive && (
+              <Text style={styles.dishName}>
+                {activeDishes.map((dish: any) => dish.title).join(", ")}
+              </Text>
+            )}
           </View>
           <View style={styles.dishesContainer}>
-            <Text style={styles.dishes}>
-              Inactive Dishes ({inactiveDishes.length}):{" "}
-            </Text>
-            <Text style={styles.dishName}>
-              {inactiveDishes.map((dish: any) => dish.title).join(", ")}
-            </Text>
+            <Pressable onPress={() => setShowInactive(!showInactive)}>
+              <Text style={styles.dishes}>
+                Inactive Dishes ({inactiveDishes.length}){" "}
+                {showInactive ? (
+                  <FontAwesome6
+                    name="sort-up"
+                    size={24}
+                    color="white"
+                    style={{ alignSelf: "baseline" }}
+                  />
+                ) : (
+                  <FontAwesome6
+                    style={{ alignSelf: "baseline" }}
+                    name="sort-down"
+                    size={24}
+                    color="white"
+                  />
+                )}
+              </Text>
+            </Pressable>
+            {showInactive && (
+              <Text style={styles.dishName}>
+                {inactiveDishes.map((dish: any) => dish.title).join(", ")}
+              </Text>
+            )}
           </View>
         </View>
       </View>
@@ -546,6 +586,7 @@ const styles = StyleSheet.create({
     color: "goldenrod",
     fontSize: 17,
     fontWeight: "500",
+    alignItems: "center",
   },
   dishName: {
     color: "white",
