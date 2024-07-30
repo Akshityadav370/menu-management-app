@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import * as Notifications from "expo-notifications";
+import Constants from "expo-constants";
 
 export default function OrdersScreen() {
   const router = useRouter();
@@ -152,6 +154,39 @@ export default function OrdersScreen() {
     }
   };
 
+  const handlePushCall = async () => {
+    // console.log("Push called");
+    try {
+      const projectId =
+        Constants?.expoConfig?.extra?.eas?.projectId ??
+        Constants?.easConfig?.projectId;
+      const token = await Notifications.getExpoPushTokenAsync({
+        projectId: projectId,
+      });
+      console.log("My token:", token.data);
+
+      const message = {
+        to: token.data,
+        sound: "default",
+        title: "Table No 12",
+        body: "Paneer Tikka X2",
+      };
+
+      await fetch("https://exp.host/--/api/v2/push/send", {
+        method: "POST",
+        headers: {
+          host: "exp.host",
+          accept: "application/json",
+          "accept-encoding": "gzip, deflate",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(message),
+      });
+    } catch (error) {
+      console.error("Error getting push token:", error);
+    }
+  };
+
   const renderOrderItem = ({ item }) => (
     <View style={styles.orderItem}>
       <View style={styles.orderItemHeader}>
@@ -160,7 +195,9 @@ export default function OrdersScreen() {
         </Text>
         <View style={styles.orderPrice}>
           <AntDesign name="delete" size={24} color={"tomato"} />
-          <FontAwesome name="edit" size={24} color={"goldenrod"} />
+          {/* <Pressable onPress={handlePushCall}>
+            <FontAwesome name="edit" size={24} color={"goldenrod"} />
+          </Pressable> */}
         </View>
       </View>
       <View style={styles.orderItemBody}>
@@ -211,10 +248,15 @@ export default function OrdersScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <AntDesign name="arrowleft" size={24} color="white" />
+        <View style={styles.headerTemp}>
+          <Pressable onPress={() => router.back()} style={styles.backButton}>
+            <AntDesign name="arrowleft" size={24} color="white" />
+          </Pressable>
+          <Text style={styles.title}>Orders</Text>
+        </View>
+        <Pressable onPress={handlePushCall}>
+          <AntDesign name="bells" size={24} color="green" />
         </Pressable>
-        <Text style={styles.title}>Orders</Text>
       </View>
       <FlatList
         data={orders}
@@ -236,7 +278,9 @@ const styles = StyleSheet.create({
     padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: "#333",
+    justifyContent: "space-between",
   },
+  headerTemp: { flexDirection: "row", alignItems: "center" },
   backButton: {
     marginRight: 15,
   },
