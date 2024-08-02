@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,135 +7,76 @@ import {
   Pressable,
   SafeAreaView,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
+import { db } from "@/firebase";
 
 export default function OrdersScreen() {
   const router = useRouter();
 
-  const orders1 = [
-    {
-      id: 1,
-      tableNo: 2,
-      status: 2,
-      specialInstructions: "No onions in any dish",
-      items: [
-        { name: "Item 1", qty: 2, price: "10" },
-        { name: "Item 2", qty: 1, price: "2" },
-        { name: "Item 3", qty: 2, price: "6" },
-      ],
-    },
-    {
-      id: 2,
-      tableNo: 3,
-      status: 3,
-      specialInstructions: "Extra spicy for all items",
-      items: [
-        { name: "Item 3", qty: 2, price: "10" },
-        { name: "Item 1", qty: 1, price: "2" },
-        { name: "Item 4", qty: 2, price: "6" },
-      ],
-    },
-    {
-      id: 3,
-      tableNo: 4,
-      status: 1,
-      specialInstructions: "Gluten-free options only",
-      items: [
-        { name: "Item 5", qty: 1, price: "10" },
-        { name: "Item 2", qty: 2, price: "5" },
-        { name: "Item 1", qty: 3, price: "15" },
-      ],
-    },
-    {
-      id: 4,
-      tableNo: 1,
-      status: 2,
-      specialInstructions: "No added sugar",
-      items: [
-        { name: "Item 2", qty: 2, price: "4" },
-        { name: "Item 3", qty: 1, price: "6" },
-        { name: "Item 4", qty: 1, price: "8" },
-      ],
-    },
-    {
-      id: 5,
-      tableNo: 5,
-      status: 1,
-      specialInstructions: "Vegetarian options only",
-      items: [
-        { name: "Item 6", qty: 4, price: "10" },
-        { name: "Item 1", qty: 2, price: "5" },
-        { name: "Item 5", qty: 1, price: "5" },
-      ],
-    },
-    {
-      id: 6,
-      tableNo: 6,
-      status: 3,
-      specialInstructions: "No cilantro",
-      items: [
-        { name: "Item 3", qty: 3, price: "10" },
-        { name: "Item 2", qty: 2, price: "10" },
-        { name: "Item 4", qty: 1, price: "5" },
-      ],
-    },
-    {
-      id: 7,
-      tableNo: 7,
-      status: 2,
-      specialInstructions: "No nuts",
-      items: [
-        { name: "Item 7", qty: 1, price: "12" },
-        { name: "Item 2", qty: 2, price: "4" },
-        { name: "Item 3", qty: 1, price: "6" },
-      ],
-    },
-    {
-      id: 8,
-      tableNo: 8,
-      status: 1,
-      specialInstructions: "Extra crispy for all fried items",
-      items: [
-        { name: "Item 4", qty: 3, price: "18" },
-        { name: "Item 5", qty: 1, price: "5" },
-        { name: "Item 1", qty: 2, price: "4" },
-      ],
-    },
-    {
-      id: 9,
-      tableNo: 9,
-      status: 2,
-      specialInstructions: "Add lemon slices",
-      items: [
-        { name: "Item 2", qty: 2, price: "4" },
-        { name: "Item 6", qty: 1, price: "10" },
-        { name: "Item 7", qty: 1, price: "2" },
-      ],
-    },
-    {
-      id: 10,
-      tableNo: 10,
-      status: 3,
-      specialInstructions: "No dairy products",
-      items: [
-        { name: "Item 8", qty: 5, price: "20" },
-        { name: "Item 3", qty: 2, price: "10" },
-        { name: "Item 1", qty: 3, price: "20" },
-      ],
-    },
-  ];
+  const [orders, setOrders] = useState([]);
 
-  const [orders, setOrders] = useState(orders1);
+  const getOrderItems = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "orders"));
+      const orderItems: any = ([] = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      })));
+      setOrders(orderItems);
+    } catch (error) {
+      console.error("Error getting order items", error);
+    }
+  };
 
-  const updateOrderStatus = (orderId, newStatus) => {
-    setOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        order.id === orderId ? { ...order, status: newStatus } : order
-      )
+  const updateOrderStatus = async (orderId, newStatus) => {
+    try {
+      const orderRef = doc(db, "orders", orderId);
+      await updateDoc(orderRef, { status: newStatus });
+      getOrderItems(); // Refresh the orders list
+    } catch (error) {
+      console.error("Error updating order status", error);
+    }
+  };
+
+  const deleteOrder = async (orderId) => {
+    try {
+      const orderRef = doc(db, "orders", orderId);
+      await deleteDoc(orderRef);
+      getOrderItems(); // Refresh the orders list
+    } catch (error) {
+      console.error("Error deleting order", error);
+    }
+  };
+
+  // Confirmation Dialog Box Before deleting
+  const confirmDelete = (tableNo, id) => {
+    Alert.alert(
+      `Table ${tableNo}`,
+      "Are you sure you want to delete this order?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: () => deleteOrder(id),
+          style: "destructive",
+        },
+      ],
+      { cancelable: false }
     );
   };
 
@@ -187,6 +128,10 @@ export default function OrdersScreen() {
     }
   };
 
+  useEffect(() => {
+    getOrderItems();
+  }, []);
+
   const renderOrderItem = ({ item }) => (
     <View style={styles.orderItem}>
       <View style={styles.orderItemHeader}>
@@ -194,10 +139,9 @@ export default function OrdersScreen() {
           Table <Text style={styles.tableNo}>{item.tableNo}</Text>
         </Text>
         <View style={styles.orderPrice}>
-          <AntDesign name="delete" size={24} color={"tomato"} />
-          {/* <Pressable onPress={handlePushCall}>
-            <FontAwesome name="edit" size={24} color={"goldenrod"} />
-          </Pressable> */}
+          <Pressable onPress={() => confirmDelete(item.tableNo, item.id)}>
+            <AntDesign name="delete" size={24} color={"tomato"} />
+          </Pressable>
         </View>
       </View>
       <View style={styles.orderItemBody}>
@@ -261,6 +205,7 @@ export default function OrdersScreen() {
       <FlatList
         data={orders}
         renderItem={renderOrderItem}
+        contentContainerStyle={styles.orderContainer}
         keyExtractor={(item) => item.id.toString()}
       />
     </SafeAreaView>
@@ -271,6 +216,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "black",
+  },
+  orderContainer: {
+    marginVertical: "5%",
   },
   header: {
     flexDirection: "row",
