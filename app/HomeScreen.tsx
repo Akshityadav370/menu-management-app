@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
+import * as Notifications from "expo-notifications";
 import {
   app,
   db,
@@ -30,6 +31,8 @@ import { useRouter } from "expo-router";
 import { FontAwesome6 } from "@expo/vector-icons";
 import logo from "@/assets/images/Viraaj Ventures Logo.png";
 import listLogo from "@/assets/images/list_logo.jpg";
+import Constants from "expo-constants";
+import { setDoc } from "firebase/firestore";
 const wines = [
   {
     title: "Tea",
@@ -316,9 +319,39 @@ export default function HomeScreen(props: any) {
     );
   };
 
+  const savePushToken = async (token: Notifications.ExpoPushToken) => {
+    try {
+      // if (!Constants.deviceId) {
+      //   console.error("Device ID is undefined");
+      //   return;
+      // }
+      // const tokenRef = doc(db, "pushTokens", Constants.deviceId);
+      const tokenRef = doc(db, "pushTokens", "1234");
+      await setDoc(tokenRef, { token: token }, { merge: true });
+      console.log("Push token saved to database");
+    } catch (error) {
+      console.error("Error saving push token:", error);
+    }
+  };
+
   // Calls the first time our app starts to fetch all the menu items from the cloud firestore
   // Only calls at the first time as the dependency array is empty
   useEffect(() => {
+    const registerForPushNotifications = async () => {
+      try {
+        const projectId =
+          Constants?.expoConfig?.extra?.eas?.projectId ??
+          Constants?.easConfig?.projectId;
+        const token = await Notifications.getExpoPushTokenAsync({
+          projectId: projectId,
+        });
+        await savePushToken(token);
+      } catch (error) {
+        console.error("Error registering for push notifications:", error);
+      }
+    };
+
+    registerForPushNotifications();
     getMenuList();
   }, []);
 

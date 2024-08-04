@@ -18,6 +18,7 @@ import {
   deleteDoc,
   doc,
   getDocs,
+  onSnapshot,
   updateDoc,
 } from "firebase/firestore";
 import { db } from "@/firebase";
@@ -27,24 +28,24 @@ export default function OrdersScreen() {
 
   const [orders, setOrders] = useState([]);
 
-  const getOrderItems = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, "orders"));
-      const orderItems: any = ([] = querySnapshot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      })));
-      setOrders(orderItems);
-    } catch (error) {
-      console.error("Error getting order items", error);
-    }
-  };
+  // const getOrderItems = async () => {
+  //   try {
+  //     const querySnapshot = await getDocs(collection(db, "orders"));
+  //     const orderItems: any = ([] = querySnapshot.docs.map((doc) => ({
+  //       ...doc.data(),
+  //       id: doc.id,
+  //     })));
+  //     setOrders(orderItems);
+  //   } catch (error) {
+  //     console.error("Error getting order items", error);
+  //   }
+  // };
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
       const orderRef = doc(db, "orders", orderId);
       await updateDoc(orderRef, { status: newStatus });
-      getOrderItems(); // Refresh the orders list
+      // getOrderItems(); // Refresh the orders list
     } catch (error) {
       console.error("Error updating order status", error);
     }
@@ -54,7 +55,7 @@ export default function OrdersScreen() {
     try {
       const orderRef = doc(db, "orders", orderId);
       await deleteDoc(orderRef);
-      getOrderItems(); // Refresh the orders list
+      // getOrderItems(); // Refresh the orders list
     } catch (error) {
       console.error("Error deleting order", error);
     }
@@ -129,7 +130,16 @@ export default function OrdersScreen() {
   };
 
   useEffect(() => {
-    getOrderItems();
+    const unsubscribe = onSnapshot(collection(db, "orders"), (snapshot) => {
+      const orderItems = snapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setOrders(orderItems);
+    });
+
+    // Clean up the listener when the component unmounts
+    return () => unsubscribe();
   }, []);
 
   const renderOrderItem = ({ item }) => (
