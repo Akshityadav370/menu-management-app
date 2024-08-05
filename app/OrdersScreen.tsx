@@ -97,36 +97,36 @@ export default function OrdersScreen() {
   };
 
   const handlePushCall = async () => {
-    // console.log("Push called");
-    try {
-      const projectId =
-        Constants?.expoConfig?.extra?.eas?.projectId ??
-        Constants?.easConfig?.projectId;
-      const token = await Notifications.getExpoPushTokenAsync({
-        projectId: projectId,
-      });
-      console.log("My token:", token.data);
+    console.log("Push called");
+    // try {
+    //   const projectId =
+    //     Constants?.expoConfig?.extra?.eas?.projectId ??
+    //     Constants?.easConfig?.projectId;
+    //   const token = await Notifications.getExpoPushTokenAsync({
+    //     projectId: projectId,
+    //   });
+    //   console.log("My token:", token.data);
 
-      const message = {
-        to: token.data,
-        sound: "default",
-        title: "Table No 12",
-        body: "Paneer Tikka X2",
-      };
+    //   const message = {
+    //     to: token.data,
+    //     sound: "default",
+    //     title: "Table No 12",
+    //     body: "Paneer Tikka X2",
+    //   };
 
-      await fetch("https://exp.host/--/api/v2/push/send", {
-        method: "POST",
-        headers: {
-          host: "exp.host",
-          accept: "application/json",
-          "accept-encoding": "gzip, deflate",
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(message),
-      });
-    } catch (error) {
-      console.error("Error getting push token:", error);
-    }
+    //   await fetch("https://exp.host/--/api/v2/push/send", {
+    //     method: "POST",
+    //     headers: {
+    //       host: "exp.host",
+    //       accept: "application/json",
+    //       "accept-encoding": "gzip, deflate",
+    //       "content-type": "application/json",
+    //     },
+    //     body: JSON.stringify(message),
+    //   });
+    // } catch (error) {
+    //   console.error("Error getting push token:", error);
+    // }
   };
 
   useEffect(() => {

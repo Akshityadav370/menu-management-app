@@ -351,7 +351,7 @@ export default function HomeScreen(props: any) {
       }
     };
 
-    registerForPushNotifications();
+    // registerForPushNotifications();
     getMenuList();
   }, []);
 
