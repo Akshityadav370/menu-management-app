@@ -1,26 +1,8 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  StyleSheet,
-  ScrollView,
-  Platform,
-} from "react-native";
-import {
-  app,
-  db,
-  getFirestore,
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  doc,
-} from "@/firebase/index";
+import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import { app } from "@/firebase/index";
 import {
   User,
-  createUserWithEmailAndPassword,
   getAuth,
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -44,19 +26,20 @@ const AuthScreen = ({
   setEmail,
   password,
   setPassword,
-  isLogin,
-  setIsLogin,
   handleAuthentication,
+  authError,
 }: any) => {
   return (
     <View style={styles.authContainer}>
-      <Text style={styles.title}>{isLogin ? "Sign In" : "Sign Up"}</Text>
+      <Text style={styles.title}>Sign In</Text>
+
+      {authError ? <Text style={styles.errorText}>{authError}</Text> : null}
 
       <TextInput
         style={styles.input}
         value={email}
         onChangeText={setEmail}
-        placeholder="yagami@gmail.com"
+        placeholder="Email ID"
         autoCapitalize="none"
         placeholderTextColor="dimgrey"
       />
@@ -64,24 +47,16 @@ const AuthScreen = ({
         style={styles.input}
         value={password}
         onChangeText={setPassword}
-        placeholder="123456"
+        placeholder="Password"
         secureTextEntry
         placeholderTextColor="dimgrey"
       />
       <View style={styles.buttonContainer}>
         <Button
-          title={isLogin ? "Sign In" : "Sign Up"}
+          title="Sign In"
           onPress={handleAuthentication}
           color="#3498db"
         />
-      </View>
-
-      <View style={styles.bottomContainer}>
-        <Text style={styles.toggleText} onPress={() => setIsLogin(!isLogin)}>
-          {isLogin
-            ? "Need an account? Sign Up"
-            : "Already have an account? Sign In"}
-        </Text>
       </View>
     </View>
   );
@@ -95,8 +70,7 @@ export default function App() {
   const [password, setPassword] = useState("");
   // Track user authentication state
   const [user, setUser] = useState<User | null>(null);
-  // State Variable to set login/signup page
-  const [isLogin, setIsLogin] = useState(true);
+  const [authError, setAuthError] = useState("");
 
   // storing the expo push token
   const [expoPushToken, setExpoPushToken] = useState("");
@@ -167,45 +141,33 @@ export default function App() {
 
   const handleAuthentication = async () => {
     try {
+      setAuthError(""); // Clear any previous errors
       if (user) {
-        // If user is already authenticated, log out
-        // console.log("User logged out successfully!");
         await signOut(auth);
       } else {
-        // Sign in or sign up
-        if (isLogin) {
-          // Sign in
-          await signInWithEmailAndPassword(auth, email, password);
-          // console.log("User signed in successfully!");
-        } else {
-          // Sign up
-          await createUserWithEmailAndPassword(auth, email, password);
-          // console.log("User created successfully!");
-        }
+        await signInWithEmailAndPassword(auth, email, password);
       }
     } catch (error: any) {
       console.error("Authentication error:", error.message);
+      setAuthError(error.message);
     }
   };
 
   return (
     <View style={styles.container}>
       {user ? (
-        // user's email is shown if user is authenticated
         <AuthenticatedScreen
           user={user}
           handleAuthentication={handleAuthentication}
         />
       ) : (
-        // Show sign-in or sign-up form if user is not authenticated
         <AuthScreen
           email={email}
           setEmail={setEmail}
           password={password}
           setPassword={setPassword}
-          isLogin={isLogin}
-          setIsLogin={setIsLogin}
           handleAuthentication={handleAuthentication}
+          authError={authError}
         />
       )}
     </View>
@@ -256,5 +218,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: "center",
     marginBottom: 20,
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginBottom: 10,
   },
 });
