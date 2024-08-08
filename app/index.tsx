@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import { app } from "@/firebase/index";
+import { Ionicons } from "@expo/vector-icons";
 import {
   User,
   getAuth,
@@ -12,6 +21,7 @@ import HomeScreen from "./HomeScreen";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
+import logo from "@/assets/images/Viraaj Ventures Logo.png";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -29,36 +39,57 @@ const AuthScreen = ({
   handleAuthentication,
   authError,
 }: any) => {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
-    <View style={styles.authContainer}>
-      <Text style={styles.title}>Sign In</Text>
-
-      {authError ? <Text style={styles.errorText}>{authError}</Text> : null}
-
-      <TextInput
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Email ID"
-        autoCapitalize="none"
-        placeholderTextColor="dimgrey"
-      />
-      <TextInput
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Password"
-        secureTextEntry
-        placeholderTextColor="dimgrey"
-      />
-      <View style={styles.buttonContainer}>
-        <Button
-          title="Sign In"
-          onPress={handleAuthentication}
-          color="#3498db"
-        />
+    <>
+      <View style={styles.logoContainer}>
+        <Image source={logo} style={styles.logo}></Image>
       </View>
-    </View>
+      <View style={styles.signInContainer}>
+        <Text style={styles.title}>Login</Text>
+        {authError ? (
+          <Text style={styles.errorText}>Invalid Email/Password</Text>
+        ) : null}
+        <TextInput
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+          placeholder="Email ID"
+          autoCapitalize="none"
+          placeholderTextColor="dimgrey"
+        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Password"
+            secureTextEntry={!showPassword}
+            placeholderTextColor="dimgrey"
+          />
+          <TouchableOpacity
+            onPress={togglePasswordVisibility}
+            style={styles.eyeIcon}
+          >
+            <Ionicons
+              name={showPassword ? "eye-off" : "eye"}
+              size={24}
+              color="dimgrey"
+            />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={handleAuthentication}>
+            <Text style={styles.singInButton}>Log In</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </>
   );
 };
 
@@ -189,23 +220,41 @@ const styles = StyleSheet.create({
     borderColor: "goldenrod",
   },
   title: {
-    fontSize: 24,
-    marginBottom: 16,
+    fontSize: 40,
+    marginBottom: "9%",
     textAlign: "center",
     color: "goldenrod",
+    fontWeight: "400",
   },
   input: {
     height: 40,
     fontSize: 20,
     borderColor: "white",
-    color: "white",
+    color: "black",
     borderWidth: 1,
     marginBottom: 16,
     padding: 8,
     borderRadius: 4,
+    width: "70%",
+    alignSelf: "center",
+    backgroundColor: "gainsboro",
   },
   buttonContainer: {
     marginBottom: 16,
+    width: "70%",
+    alignSelf: "center",
+    marginTop: "10%",
+    backgroundColor: "goldenrod",
+    borderRadius: 10,
+  },
+  singInButton: {
+    // padding: 50,
+    textAlign: "center",
+    fontSize: 20,
+    padding: 13,
+    fontWeight: "500",
+    color: "white",
+    textTransform: "uppercase",
   },
   toggleText: {
     color: "goldenrod",
@@ -223,5 +272,46 @@ const styles = StyleSheet.create({
     color: "red",
     textAlign: "center",
     marginBottom: 10,
+  },
+  signInContainer: {
+    height: "65%",
+    marginTop: "auto",
+    backgroundColor: "whitesmoke",
+    borderTopStartRadius: 20,
+    borderTopEndRadius: 20,
+    // paddingVertical: "10%",
+    justifyContent: "center",
+  },
+  logoContainer: {
+    height: "auto",
+    width: "100%",
+  },
+  logo: {
+    height: 100,
+    width: "100%",
+    margin: "auto",
+    objectFit: "contain",
+    marginTop: "20%",
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "70%",
+    alignSelf: "center",
+    marginBottom: 16,
+    backgroundColor: "gainsboro",
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: "white",
+  },
+  passwordInput: {
+    flex: 1,
+    height: 40,
+    fontSize: 20,
+    color: "black",
+    padding: 8,
+  },
+  eyeIcon: {
+    padding: 10,
   },
 });
